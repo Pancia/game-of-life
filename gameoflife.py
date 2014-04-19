@@ -1,29 +1,38 @@
 import time
 
 def main():
-	assert 0 < 10
-	play_game_of_life(
-		int(raw_input("max_size? ")),
-		int(raw_input("num_iters? ")),
-		float(raw_input("sleep_time? "))
-	)
+	test = str(raw_input("test_run?[Y/n] "))
+	if test == "" or test.lower() == "y":
+		play_game_of_life(6, 10, .5, True)
+	else:
+		play_game_of_life(
+			int(raw_input("max_size? ")),
+			int(raw_input("num_iters? ")),
+			float(raw_input("sleep_time? ")),
+			False
+		)
 
 #upgrade game_board to class
-#with fields, such as num_live_cells
-def play_game_of_life(max_size, num_iters, sleep_time):
+#with fields, such as game_board, num_live_cells, etc,
+#and functions, such as update_board(), make_cell_alive(), etc.
+def play_game_of_life(max_size, num_iters, sleep_time, is_test_run):
 	game_board = [[' ' for i in range(max_size)] for j in range(max_size)]
-	if str(raw_input("add_glider? ")) == "yes":
-		add_glider(game_board, max_size);
+	if not is_test_run:
+		should_add_glider = str(raw_input("add_glider?[Y/n] ")).lower()
+		if should_add_glider == "y" or should_add_glider == "":
+			add_glider(game_board, max_size);
+		else:
+			print "enter \"stop\" or \"done\" when finished"
+			while True:
+				i = raw_input("i? ")
+				if i == "stop" or i == "done":
+					break;
+				j = raw_input("j? ")
+				if j == "stop" or j == "done":
+					break;
+				make_alive(game_board, max_size, int(i), int(j))
 	else:
-		print "enter \"stop\" or \"done\" when finished"
-		while True:
-			i = raw_input("i? ")
-			if i == "stop" or i == "done":
-				break;
-			j = raw_input("j? ")
-			if j == "stop" or j == "done":
-				break;
-			make_alive(game_board, max_size, int(i), int(j))
+		add_glider(game_board, max_size)
 
 	print_game_of_life(game_board, max_size)
 	for q in range(num_iters):
@@ -56,13 +65,11 @@ def update_game_board(game_board, max_size):
 
 def get_neighbor_count(game_board, max_size, i, j):
 	count = 0
-	#print ">>i:"+str(i)+"|j:"+str(j)
 	for x in range(-1, 2):
 		for y in range(-1, 2):
-			#print "x:"+str(x)+"|y:"+str(y)
 			if x==0 and y==0:
 				continue
-			if i+x < 0: #or i+x > max_size-1 or j+y < 0 or j+y > max_size-1:
+			if i+x < 0: 
 				i_x = max_size-1
 			elif i+x > max_size-1:
 				i_x = 0
@@ -74,7 +81,6 @@ def get_neighbor_count(game_board, max_size, i, j):
 				j_y = 0
 			else:
 				j_y = j+y
-			#print ">i+x:"+str(i+x)+"|j+y:"+str(j+y)
 			if game_board[i_x][j_y] == 'x':
 				count += 1
 	return count
