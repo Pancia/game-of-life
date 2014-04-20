@@ -12,7 +12,7 @@ def main():
             False
         )
 
-#upgrade game_board to class
+#upgrade game_board to clas
 #with fields, such as game_board, num_live_cells, etc,
 #and functions, such as update_board(), make_cell_alive(), etc.
 def play(max_size, num_iters, sleep_time, is_test_run):
