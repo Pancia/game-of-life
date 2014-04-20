@@ -30,7 +30,7 @@ def play_game_of_life(max_size, num_iters, sleep_time):
                 break
             except ValueError, ve:
                 print str(ve)
-    else:
+    if str(raw_input("create creature?[Y/n]")) in "yY":
         print "enter \"stop\", \"done\", or \"save\" when finished"
         print "enter \"print\" to display currect creation"
         print "enter \"save\" to store current creation"
@@ -167,7 +167,7 @@ class GameCreature():
         creature_types = GameCreature.get_all_creatures()
         creature_types[str(name)] = points
         with open("creatures.json", "r+") as out_file:
-            json.dump(creature_types, out_file)
+            json.dump(creature_types, out_file, indent=4)
         print creature_types
 
     def get_cells(self):
