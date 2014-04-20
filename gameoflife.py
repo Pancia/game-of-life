@@ -116,10 +116,10 @@ class GameBoard():
         return count
 
     def print_game_board(self):
-        print ""
+        print "  "+" ".join(map(str, range(self.max_size)))
         for i in range(self.max_size):
-            buf = ""
-            sep = ""
+            buf = str(i) + " "
+            sep = "  "
             for j in range(self.max_size):
                 buf += self.game_board[i][j] + "|"
                 sep += "--"
