@@ -2,7 +2,7 @@ import time
 
 def main():
 	test = str(raw_input("test_run?[Y/n] "))
-	if test == "" or test.lower() == "y":
+	if test in "Yy ":
 		play_game_of_life(6, 10, .5, True)
 	else:
 		play_game_of_life(
@@ -19,16 +19,16 @@ def play_game_of_life(max_size, num_iters, sleep_time, is_test_run):
 	game_board = [[' ' for i in range(max_size)] for j in range(max_size)]
 	if not is_test_run:
 		should_add_glider = str(raw_input("add_glider?[Y/n] ")).lower()
-		if should_add_glider == "y" or should_add_glider == "":
+		if should_add_glider in "y ":
 			add_glider(game_board, max_size);
 		else:
 			print "enter \"stop\" or \"done\" when finished"
 			while True:
 				i = raw_input("i? ")
-				if i == "stop" or i == "done":
+				if i in ["stop", "done"]:
 					break;
 				j = raw_input("j? ")
-				if j == "stop" or j == "done":
+				if j in ["stop", "done"]:
 					break;
 				make_alive(game_board, max_size, int(i), int(j))
 	else:
