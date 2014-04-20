@@ -44,11 +44,8 @@ def play_game_of_life(max_size, num_iters, sleep_time, is_test_run):
 #refactor to class/subclass
 #and add starting location, rather than set board position
 def add_glider(game_board, max_size): #ADD: (i, j):
-	make_alive(game_board, max_size, 0, 0)
-	make_alive(game_board, max_size, 1, 1)
-	make_alive(game_board, max_size, 1, 2)
-	make_alive(game_board, max_size, 2, 1)
-	make_alive(game_board, max_size, 0, 2)
+	for i, j in [[0,0], [1,1], [1,2], [2,1], [0,2]]:
+		make_alive(game_board, max_size, i, j)
 
 def update_game_board(game_board, max_size):
 	new_game_board = [row[:] for row in game_board]
