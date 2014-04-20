@@ -1,48 +1,63 @@
 import time
+import json
+import os
 
 #consider switching to outputting to GUI for learning purposes
 def main():
-    test = str(raw_input("test_run?[Y/n] "))
-    if test in "Yy ":
-        play_game_of_life(max_size=6, num_iters=13, sleep_time=.3, is_test_run=True)
+    test = str(raw_input("test_run?[y/N] "))
+    if test != "" and test in "Yy":
+        play_game_of_life(max_size=10, num_iters=25, sleep_time=.2)
     else:
         try:
             play_game_of_life(
                 int(raw_input("max_size? ")),
                 int(raw_input("num_iters? ")),
-                float(raw_input("sleep_time? ")),
-                False)
+                float(raw_input("sleep_time? ")))
         except ValueError, ve:
             print "\tERROR: "+str(ve)
             print "\tTRY AGAIN"
             main()
 
-#add self.num_live_cells 
-def play_game_of_life(max_size, num_iters, sleep_time, is_test_run):
+def play_game_of_life(max_size, num_iters, sleep_time):
     game_board = GameBoard(max_size)
-    if not is_test_run:
-        if str(raw_input("add_glider?[Y/n] ")) in "yY":
-            game_board.add_creature(GameCreature("glider"))
-        else:
-            print "enter \"stop\" or \"done\" when finished"
-                while True:
-                    i = raw_input("i? ")
-                    if i in ["stop", "done"]:
-                        break;
-                    j = raw_input("j? ")
-                    if j in ["stop", "done"]:
-                        break;
-                    game_board.set_cell_to(int(i), int(j), True)
+    if str(raw_input("add_creature?[Y/n] ")) in "yY":
+        while True:
+            creature_name = str(raw_input("creature_name? "))
+            if creature_name in ["stop", "done"]:
+                break
+            try:
+                game_board.add_creature(GameCreature(creature_name))
+                break
+            except ValueError, ve:
+                print str(ve)
     else:
-        game_board.add_creature(GameCreature("glider"))
+        print "enter \"stop\", \"done\", or \"save\" when finished"
+        print "enter \"print\" to display currect creation"
+        print "enter \"save\" to store current creation"
+        points = []
+        while True:
+            i = raw_input("i? ").lower()
+            if i in ["stop", "done"]:
+                break;
+            elif i in ["print"]:
+                game_board.print_game_board()
+                continue
+            elif i in ["save"]:
+                GameCreature.save_creature(str(raw_input("name? ")), points)
+                break
+            j = raw_input("j? ").lower()
+            if j in ["stop", "done"]:
+                break;
+            game_board.toggle_cell(int(i), int(j))
+            points.append([i,j])
 
     game_board.print_game_board()
     for q in range(num_iters):
         game_board.update_game_board()
         game_board.print_game_board()
         time.sleep(sleep_time)
-    end = raw_input("end?[Y/n] ")
-    if end not in "yY":
+    end = raw_input("end?[y/N] ")
+    if end == "" or end not in "yY":
         main()
 
 class GameBoard():
@@ -50,13 +65,13 @@ class GameBoard():
     dead_cell = ' '
 
     def __init__(self, max_size):
-            self.max_size = max_size
-            self.game_board = [[self.dead_cell for i in range(max_size)] for j in range(max_size)]
-            self.num_live_cells = 0
+        self.max_size = max_size
+        self.game_board = [[self.dead_cell for i in range(max_size)] for j in range(max_size)]
+        self.num_live_cells = 0
 
     def add_creature(self, creature, x=0, y=0):
-            for i, j in creature.get_cells():
-                    self.toggle_cell(i+x, j+y)
+        for i, j in creature.get_cells():
+            self.toggle_cell(int(i)+x, int(j)+y, True)
 
     def update_game_board(self):
         if self.num_live_cells == 0:
@@ -71,7 +86,8 @@ class GameBoard():
                 if self.game_board[i][j] == self.live_cell:
                     if num_neighbors < 2 or num_neighbors > 3:
                         new_game_board.toggle_cell(i, j)
-                    elif num_neighbors == 3:
+                else:
+                    if num_neighbors == 3:
                         new_game_board.toggle_cell(i, j)
 
         self.game_board = new_game_board.game_board
@@ -111,28 +127,48 @@ class GameBoard():
             print sep       
         print ""
 
-    def toggle_cell(self, i, j):
+    def toggle_cell(self, i, j, to_alive=None):
         try:
-            if self.game_board[i][j] == self.live_cell:
-                self.game_board[i][j] = self.dead_cell
-                self.num_live_cells += 1
+            if to_alive == None:
+                if self.game_board[i][j] == self.live_cell:
+                    self.game_board[i][j] = self.dead_cell
+                    self.num_live_cells -= 1
+                else:
+                    self.game_board[i][j] = self.live_cell
+                    self.num_live_cells += 1
             else:
-                self.game_board[i][j] = self.live_cell
-                self.num_live_cells -= 1
-
+                if to_alive:
+                    self.game_board[i][j] = self.live_cell
+                    self.num_live_cells += 1
+                else:
+                    self.game_board[i][j] = self.dead_cell
+                    self.num_live_cells -= 1
         except IndexError, e:
             print str(e) + "; max_size is " + str(max_size)
 
-#how to implement prompting and saving (persistently) user created creatures?
 class GameCreature():
-    glider_cells = [[0,0], [1,1], [1,2], [2,1], [0,2]]
+    def __init__(self, name):
+        self.creature_type = name
+        self.creature_types = GameCreature.get_all_creatures()
+        print self.creature_types
 
-    def __init__(self, creature_type):
-        self.creature_type = creature_type
-        if self.creature_type == "glider":
-            self.cells = self.glider_cells
-        else: #ie default
-            self.cells = self.glider_cells
+        if name in self.creature_types:
+            self.cells = self.creature_types[name]
+        else:
+            raise TypeError(name + " is not a stored creature type")
+
+    @staticmethod
+    def get_all_creatures():
+        with open("creatures.json", "r") as in_file:
+            return json.load(in_file)
+
+    @staticmethod
+    def save_creature(name, points):
+        creature_types = GameCreature.get_all_creatures()
+        creature_types[str(name)] = points
+        with open("creatures.json", "r+") as out_file:
+            json.dump(creature_types, out_file)
+        print creature_types
 
     def get_cells(self):
         return self.cells
