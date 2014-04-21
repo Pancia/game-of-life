@@ -4,8 +4,8 @@ import os
 
 #consider switching to outputting to GUI for learning purposes
 def main():
-    test = str(raw_input("test_run?[y/N] "))
-    if test != "" and test in "Yy":
+    test = raw_input("test_run?[y/N] ")
+    if test in "Yy":
         play_game_of_life(max_size=10, num_iters=25, sleep_time=.2)
     else:
         try:
@@ -20,9 +20,9 @@ def main():
 
 def play_game_of_life(max_size, num_iters, sleep_time):
     game_board = GameBoard(max_size)
-    if str(raw_input("add_creature?[Y/n] ")) in "yY":
+    if raw_input("add_creature?[Y/n] ") in "yY":
         while True:
-            creature_name = str(raw_input("creature_name? "))
+            creature_name = raw_input("creature_name? ")
             if creature_name in ["stop", "done"]:
                 break
             try:
@@ -30,35 +30,36 @@ def play_game_of_life(max_size, num_iters, sleep_time):
                 break
             except ValueError, ve:
                 print str(ve)
-    if str(raw_input("create creature?[Y/n]")) in "yY":
-        print "enter \"stop\", \"done\", or \"save\" when finished"
-        print "enter \"print\" to display currect creation"
-        print "enter \"save\" to store current creation"
-        points = []
-        while True:
-            i = raw_input("i? ").lower()
-            if i in ["stop", "done"]:
-                break;
-            elif i in ["print"]:
-                game_board.print_game_board()
-                continue
-            elif i in ["save"]:
-                GameCreature.save_creature(str(raw_input("name? ")), points)
-                break
-            j = raw_input("j? ").lower()
-            if j in ["stop", "done"]:
-                break;
-            game_board.toggle_cell(int(i), int(j))
-            points.append([i,j])
+    if raw_input("create_creature?[Y/n] ") in "yY":
+        game_board = create_creature(game_board)
 
     game_board.print_game_board()
     for q in range(num_iters):
         game_board.update_game_board()
         game_board.print_game_board()
         time.sleep(sleep_time)
-    end = raw_input("end?[y/N] ")
-    if end == "" or end not in "yY":
+    if raw_input("end?[y/N] ") not in "yY":
         main()
+
+def create_creature(game_board):
+    print "enter \"stop\", \"done\", or \"save\" when finished"
+    print "enter \"print\" to display currect creation"
+    print "enter \"save\" to store current creation"
+    while True:
+        i = raw_input("i? ").lower()
+        if i in ["stop", "done"]:
+            break;
+        elif i in ["print"]:
+            game_board.print_game_board()
+            continue
+        elif i in ["save"]:
+            GameCreature.save_creature(raw_input("name? "), points)
+            break
+        j = raw_input("j? ").lower()
+        if j in ["stop", "done"]:
+            break;
+        game_board.toggle_cell(int(i), int(j))
+    return game_board
 
 class GameBoard():
     live_cell = 'x'
