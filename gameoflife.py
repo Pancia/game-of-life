@@ -31,7 +31,7 @@ def play_game_of_life(max_size, num_iters, sleep_time):
             except ValueError, ve:
                 print str(ve)
     if raw_input("create_creature?[Y/n] ") in "yY":
-        points, game_board = create_creature(game_board)
+        game_board = create_creature(game_board)
 
     game_board.print_game_board()
     for q in range(num_iters):
@@ -45,7 +45,6 @@ def create_creature(game_board):
     print "enter \"stop\", \"done\", or \"save\" when finished"
     print "enter \"print\" to display currect creation"
     print "enter \"save\" to store current creation"
-    points = []
     while True:
         i = raw_input("i? ").lower()
         if i in ["stop", "done"]:
@@ -60,8 +59,7 @@ def create_creature(game_board):
         if j in ["stop", "done"]:
             break;
         game_board.toggle_cell(int(i), int(j))
-        points.append([i,j])
-    return points, game_board
+    return game_board
 
 class GameBoard():
     live_cell = 'x'
